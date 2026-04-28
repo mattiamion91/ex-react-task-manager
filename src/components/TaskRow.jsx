@@ -1,5 +1,7 @@
 //importo memo da react
 import { memo } from "react";
+//importo linlk
+import { Link } from "react-router-dom";
 
 export default memo(function TaskRow({ task }) {
        
@@ -23,7 +25,7 @@ export default memo(function TaskRow({ task }) {
 
     return (
         <tr>
-            <td>{title}</td>
+            <td><Link to={`/task/${task.id}`}>{title}</Link></td>
             <td style={handleColor(status)}>{status}</td>
             <td>{createdAt}</td>
         </tr>

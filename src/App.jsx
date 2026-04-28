@@ -5,6 +5,7 @@ import './App.css'
 //importo le pagine
 import TaskList from './pages/TaskList'
 import TaskAdd from './pages/TaskAdd'
+import TaskDetail from './pages/TaskDetail'
 import { GlobalProvider } from './context/GlobalContext'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path='/' element={<TaskList />}></Route>
           <Route path='/addtask' element={<TaskAdd />}></Route>
+          <Route path='/task/:id' element={<TaskDetail />}></Route>
         </Routes>
       </BrowserRouter>
     </GlobalProvider>

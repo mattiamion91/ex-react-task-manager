@@ -11,7 +11,27 @@ export default function useTasks() {
             .catch(err => console.log("errore caricamento", err))
     }, [])
     //funzione per aggiungere task
-    function addTask() { }
+    async function addTask(newTask) {
+        try {
+            const res = await fetch("http://localhost:3001/tasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newTask)
+            })
+
+            const data = await res.json()
+
+            if (data.success) {
+                setTaskList((prev) => [...prev, data.task])
+            } else {
+                throw new Error(data.message)
+            }
+        } catch (err) {
+            console.error("errore durante invio", err.message);
+            throw err
+        }
+
+    }
     //funzione per modificare task
     function updateTask() { }
     //funziuone per rimuovere task

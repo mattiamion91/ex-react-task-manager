@@ -1,28 +1,53 @@
 import { useState, useRef, useMemo } from "react"
+//importo il conteto
+import { useGlobal } from "../context/GlobalContext";
 
 //simboli non ammessi
 const symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~";
 
 export default function TaskAdd() {
-
+    //prendo la funzione dal contesto
+    const { addTask } = useGlobal();
     //var di stato tiutolo
     const [title, setTitle] = useState("")
     //elementi non controllati
     const refStatus = useRef()
-    const resDescription = useRef()
+    const refDescription = useRef()
     //funnzione gestione del submit
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        if(isTitleValid) {
-            alert('hai usato caratteri non validi')
-            return;
-        } else(title === ""); {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (title.trim() === "") {
             alert("il titolo non puo essere vuoto")
-            return;
+            return
+        }
+        if (isTitleValid) {
+            alert('hai usato caratteri non validi')
+            return
+        }
+
+        //creao la nuova task
+        const newTask = {
+            title: title,
+            description: refDescription.current.value,
+            status: refStatus.current.value
+        }
+
+        try {
+            //eseguo la funzione addTask per aggiungere la task
+            console.log("Dati inviati:", newTask);
+            await addTask(newTask)
+            //in caso di sucesso mostro un alert
+            alert("task aggiunta con successo")
+            //pulisco il campo controllato
+            setTitle("")
+            //pulisco i campi non controllati
+            e.target.reset
+        } catch (err) {
+            alert("errore: " + err.message)
         }
         console.log(`
             titolo: ${title}
-            descrizione: ${resDescription.current.value}
+            descrizione: ${refDescription.current.value}
             status: ${refStatus.current.value}
             `);
 
@@ -30,7 +55,7 @@ export default function TaskAdd() {
     //validazione
     const isTitleValid = useMemo(() => {
         return (
-            [...title].some(c=>symbols.includes(c))
+            [...title].some(c => symbols.includes(c))
         )
     }, [title])
 
@@ -40,6 +65,7 @@ export default function TaskAdd() {
             <label
                 htmlFor="titolo">
                 <input
+                    required
                     type="text"
                     value={title}
                     onChange={e => setTitle(e.target.value)}
@@ -49,7 +75,7 @@ export default function TaskAdd() {
                 htmlFor="descrizione">
                 <textarea
                     type="text"
-                    ref={resDescription}
+                    ref={refDescription}
                 />
             </label>
             <label
