@@ -2,9 +2,22 @@
 import { useGlobal } from "../context/GlobalContext"
 //importo componente taskrow
 import TaskRow from "../components/TaskRow"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useCallback, useRef} from "react"
+
+//funzione generica di debounce
+function debounce(callback, wait) {
+    let timer;
+    return (value) => {
+        clearTimeout(timer);
+        timer = setTimeout(()=>{
+            callback(value)
+        }, wait)
+    }
+}
 
 export default function TaskList() {
+    //stato per ricerecare task
+    const [searchQuery, setSearchQuery] = useState("")
     //stati per gestione ordinamento
     const [sortBy, setSortBy] = useState("createdAt")
     const [sortOrder, setSortOrder] = useState(1)
@@ -21,20 +34,30 @@ export default function TaskList() {
     }
     //funzione che gestisce ordinamento tasks
     const sortedList = useMemo(() => {
+        //var lista listrata
+        const filteredList = [...taskList].filter(t=>t.title.toLowerCase().includes(searchQuery.toLowerCase()))
         if (sortBy === "title") {
-            return [...tasks].sort((a, b) => a.title.localeCompare(b.title) * sortOrder)
+            return filteredList.sort((a, b) => a.title.localeCompare(b.title) * sortOrder)
         } if (sortBy === "status") {
             const statusArr = ["To do", "Doing", "Done"]
-            return [...tasks].sort((a, b) => (statusArr.indexOf(a.status) - statusArr.indexOf(b.status)) * sortOrder)
+            return filteredList.sort((a, b) => (statusArr.indexOf(a.status) - statusArr.indexOf(b.status)) * sortOrder)
         } if (sortBy === "createdAt") {
-            return [...tasks].sort((a, b) => (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * sortOrder)
+            return filteredList.sort((a, b) => (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * sortOrder)
         } else {
-            return tasks
+            return filteredList
         }
-    }, [tasks, sortBy, sortOrder])
+    }, [taskList, sortBy, sortOrder, searchQuery])
+
+    //funzione debouncata ricerca
+    const debouncedFn = useCallback(debounce(setSearchQuery, 500), [])
 
     return (<>
         <h1>sono tasklist.jsx</h1>
+        <label>Cerca...
+            <input
+                type="text"
+                onChange={e => debouncedFn(e.target.value)} />
+        </label>
         <table>
             <thead>
                 <tr>
@@ -51,3 +74,4 @@ export default function TaskList() {
         </table>
     </>)
 }
+
