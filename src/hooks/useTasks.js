@@ -70,5 +70,8 @@ export default function useTasks() {
         //se id coincide allora sostitusico oldT con newT, altrimenti tengo la stessa oldT
         setTaskList((prev) => prev.map(oldT => oldT.id === newT.id ? newT : oldT))
     }
+
+    //funzione per rimuovere task multiple
+    function removeMultipleTasks([taskids]) {}
     return { taskList, addTask, updateTask, removeTask }
 }

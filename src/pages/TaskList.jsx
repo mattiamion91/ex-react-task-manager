@@ -16,17 +16,21 @@ function debounce(callback, wait) {
 }
 
 export default function TaskList() {
+    //stato per memorizare id task selezionate
+    const [selectedTaskIds, setSelectedTaskIds] = useState([])
     //stato per ricerecare task
     const [searchQuery, setSearchQuery] = useState("")
     //stati per gestione ordinamento
     const [sortBy, setSortBy] = useState("createdAt")
     const [sortOrder, setSortOrder] = useState(1)
+    //var direzione freccia
+    const sortIcon = sortOrder === 1 ? "⬆" : "⬇";
     //uso tasks da contesto globale
     const { taskList } = useGlobal()
     //funzione gestione sort
     const handleSort = (column) => {
         if (sortBy === column) {
-            setSortOrder(sortOrder * -1)
+            setSortOrder(prev=> prev * -1)
         } else {
             setSortOrder(1)
             setSortBy(column)
@@ -51,6 +55,16 @@ export default function TaskList() {
     //funzione debouncata ricerca
     const debouncedFn = useCallback(debounce(setSearchQuery, 500), [])
 
+    //funzione che aggiorna selectedTaskIds, aggiungendo o rimuovendo l’ID della task
+    function toggleSelection(taskId) {
+        const isSelected = selectedTaskIds.includes(taskId)
+        if (isSelected) {
+            setSelectedTaskIds(prev => prev.filter(id => id !== taskId))
+        } else {
+            setSelectedTaskIds(prev=>[...prev, taskId])
+        }}
+
+
     return (<>
         <h1>sono tasklist.jsx</h1>
         <label>Cerca...
@@ -61,17 +75,22 @@ export default function TaskList() {
         <table>
             <thead>
                 <tr>
-                    <th onClick={() => handleSort("title")}>titolo</th>
-                    <th onClick={() => handleSort("status")}>status</th>
-                    <th onClick={() => handleSort("createdAt")}>data di creazine</th>
+                    <th onClick={() => handleSort("title")}>titolo{sortBy === "title" && sortIcon}</th>
+                    <th onClick={() => handleSort("status")}>status{sortBy === "status" && sortIcon}</th>
+                    <th onClick={() => handleSort("createdAt")}>data di creazine{sortBy === "createdAt" && sortIcon}</th>
                 </tr>
             </thead>
             <tbody>
                 {sortedList.map((t) => (
-                    <TaskRow key={t.id} task={t} />
+                    <TaskRow 
+                    key={t.id} 
+                    task={t} 
+                    checked={selectedTaskIds.includes(t.id)}
+                    onToggle={()=>toggleSelection(t.id)} />
                 ))}
             </tbody>
         </table>
+        {selectedTaskIds.length > 0 && <button>Elimina selezionate</button>}
     </>)
 }
 
