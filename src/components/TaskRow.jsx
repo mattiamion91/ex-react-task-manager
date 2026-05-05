@@ -27,7 +27,7 @@ export default memo(function TaskRow({ task }) {
         <tr>
             <td><Link to={`/task/${task.id}`}>{title}</Link></td>
             <td style={handleColor(status)}>{status}</td>
-            <td>{createdAt}</td>
+            <td>{new Date (createdAt).toLocaleDateString()}</td>
         </tr>
     )
 })

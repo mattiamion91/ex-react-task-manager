@@ -1,11 +1,13 @@
 import { useState, useRef, useMemo } from "react"
 //importo il conteto
 import { useGlobal } from "../context/GlobalContext";
+import { useNavigate } from "react-router-dom";
 
 //simboli non ammessi
 const symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~";
 
 export default function TaskAdd() {
+    const navigate = useNavigate()
     //prendo la funzione dal contesto
     const { addTask } = useGlobal();
     //var di stato tiutolo
@@ -50,6 +52,7 @@ export default function TaskAdd() {
             descrizione: ${refDescription.current.value}
             status: ${refStatus.current.value}
             `);
+        navigate("/")
 
     }
     //validazione
@@ -81,7 +84,8 @@ export default function TaskAdd() {
             <label
                 htmlFor="staus">
                 <select name="status"
-                    ref={refStatus}>
+                    ref={refStatus}
+                    defaultValue={"To Do"}>
                     <option value="To do">To do</option>
                     <option value="Doing">Doing</option>
                     <option value="Done">Done</option>
